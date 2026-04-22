@@ -1,20 +1,19 @@
 using Soenneker.ElevenLabs.HttpClients.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.ElevenLabs.HttpClients.Tests;
 
-[Collection("Collection")]
-public sealed class ElevenLabsOpenApiHttpClientTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public sealed class ElevenLabsOpenApiHttpClientTests : HostedUnitTest
 {
     private readonly IElevenLabsOpenApiHttpClient _httpclient;
 
-    public ElevenLabsOpenApiHttpClientTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public ElevenLabsOpenApiHttpClientTests(Host host) : base(host)
     {
         _httpclient = Resolve<IElevenLabsOpenApiHttpClient>(true);
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
