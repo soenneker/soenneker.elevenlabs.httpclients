@@ -11,13 +11,13 @@ using Soenneker.Utils.HttpClientCache.Abstract;
 
 namespace Soenneker.ElevenLabs.HttpClients;
 
-///<inheritdoc cref="IElevenLabsOpenApiHttpClient"/>
 public sealed class ElevenLabsOpenApiHttpClient : IElevenLabsOpenApiHttpClient
 {
     private readonly IHttpClientCache _httpClientCache;
     private readonly IConfiguration _config;
+    private readonly string _cacheKey = $"{nameof(ElevenLabsOpenApiHttpClient)}:{Guid.NewGuid():N}";
 
-    private const string _prodBaseUrl = "https://api.elevenlabs.io/v1/";
+    private const string _prodBaseUrl = "https://api.elevenlabs.io/";
 
     public ElevenLabsOpenApiHttpClient(IHttpClientCache httpClientCache, IConfiguration config)
     {
@@ -27,10 +27,10 @@ public sealed class ElevenLabsOpenApiHttpClient : IElevenLabsOpenApiHttpClient
 
     public ValueTask<HttpClient> Get(CancellationToken cancellationToken = default)
     {
-        return _httpClientCache.Get(nameof(ElevenLabsOpenApiHttpClient), (config: _config, baseUrl: _config["ElevenLabs:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
+        return _httpClientCache.Get(_cacheKey, (config: _config, baseUrl: _config["ElevenLabs:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
         {
             var apiKey = state.config.GetValueStrict<string>("ElevenLabs:ApiKey");
-            string authHeaderName = state.config["ElevenLabs:AuthHeaderName"] ?? "Bearer {token}";
+            string authHeaderName = state.config["ElevenLabs:AuthHeaderName"] ?? "xi-api-key";
             string authHeaderValueTemplate = state.config["ElevenLabs:AuthHeaderValueTemplate"] ?? "{token}";
             string authHeaderValue = authHeaderValueTemplate.Replace("{token}", apiKey, StringComparison.Ordinal);
 
@@ -45,20 +45,13 @@ public sealed class ElevenLabsOpenApiHttpClient : IElevenLabsOpenApiHttpClient
         }, cancellationToken);
     }
 
-    /// <summary>
-    /// Releases resources used by the current instance.
-    /// </summary>
     public void Dispose()
     {
-        _httpClientCache.RemoveSync(nameof(ElevenLabsOpenApiHttpClient));
+        _httpClientCache.RemoveSync(_cacheKey);
     }
 
-    /// <summary>
-    /// Asynchronously releases resources used by the current instance.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous operation.</returns>
     public ValueTask DisposeAsync()
     {
-        return _httpClientCache.Remove(nameof(ElevenLabsOpenApiHttpClient));
+        return _httpClientCache.Remove(_cacheKey);
     }
 }
