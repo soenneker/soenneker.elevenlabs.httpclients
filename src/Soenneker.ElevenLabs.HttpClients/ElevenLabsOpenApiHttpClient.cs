@@ -11,6 +11,7 @@ using Soenneker.Utils.HttpClientCache.Abstract;
 
 namespace Soenneker.ElevenLabs.HttpClients;
 
+/// <inheritdoc cref="IElevenLabsOpenApiHttpClient" />
 public sealed class ElevenLabsOpenApiHttpClient : IElevenLabsOpenApiHttpClient
 {
     private readonly IHttpClientCache _httpClientCache;
