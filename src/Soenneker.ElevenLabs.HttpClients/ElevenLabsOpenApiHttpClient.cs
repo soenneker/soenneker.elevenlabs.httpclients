@@ -30,7 +30,7 @@ public sealed class ElevenLabsOpenApiHttpClient : IElevenLabsOpenApiHttpClient
     {
         return _httpClientCache.Get(_cacheKey, (config: _config, baseUrl: _config["ElevenLabs:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
         {
-            var apiKey = state.config.GetValueStrict<string>("ElevenLabs:ApiKey");
+            var apiKey = state.config.GetStringStrict("ElevenLabs:ApiKey");
             string authHeaderName = state.config["ElevenLabs:AuthHeaderName"] ?? "xi-api-key";
             string authHeaderValueTemplate = state.config["ElevenLabs:AuthHeaderValueTemplate"] ?? "{token}";
             string authHeaderValue = authHeaderValueTemplate.Replace("{token}", apiKey, StringComparison.Ordinal);
